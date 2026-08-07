@@ -82,6 +82,107 @@ fun DashboardScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // How to Use Onboarding Indicator Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("onboarding_indicator_card"),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+            ) {
+                var onboardingStep by remember { mutableStateOf(0) }
+                val steps = listOf(
+                    Triple("1. The 20-20-20 Rule", "Every 20 minutes of screen time, look at least 20 feet away for 20 seconds to relax your eye muscles.", Icons.Default.Visibility),
+                    Triple("2. Risk Prediction System", "Assess your digital eye strain risk based on age, daily screen hours, symptoms, and multilingual preferences.", Icons.Default.Assessment),
+                    Triple("3. Floating Quick Break Button", "Enable the floating assistant over other apps to trigger instant 20-second eye breaks anywhere.", Icons.Default.Layers),
+                    Triple("4. Blue Light & Exercises", "Activate evening dark mode, reduce glare, test vision, and follow guided eye yoga exercises.", Icons.Default.Favorite)
+                )
+                val current = steps[onboardingStep]
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Icon(current.third, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(
+                                text = "How to Use: ${current.first}",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                        Text(
+                            text = "${onboardingStep + 1}/${steps.size}",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                        )
+                    }
+
+                    Text(
+                        text = current.second,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.9f)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Dot indicators
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            steps.indices.forEach { idx ->
+                                Box(
+                                    modifier = Modifier
+                                        .size(if (idx == onboardingStep) 10.dp else 6.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            if (idx == onboardingStep) MaterialTheme.colorScheme.primary
+                                            else MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.4f)
+                                        )
+                                )
+                            }
+                        }
+
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            if (onboardingStep > 0) {
+                                OutlinedButton(
+                                    onClick = { onboardingStep-- },
+                                    modifier = Modifier.height(36.dp),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onPrimaryContainer)
+                                ) {
+                                    Text("Back", fontSize = 12.sp)
+                                }
+                            }
+                            Button(
+                                onClick = {
+                                    if (onboardingStep < steps.size - 1) {
+                                        onboardingStep++
+                                    } else {
+                                        onboardingStep = 0
+                                    }
+                                },
+                                modifier = Modifier
+                                    .height(36.dp)
+                                    .testTag("onboarding_next_button"),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                            ) {
+                                Text(if (onboardingStep < steps.size - 1) "Next" else "Restart", fontSize = 12.sp)
+                            }
+                        }
+                    }
+                }
+            }
+
             // Dark Mode / Glare Reduction Quick Card
             Card(
                 modifier = Modifier
