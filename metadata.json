@@ -1,0 +1,7 @@
+{
+  "name": "EyeCare Pro",
+  "description": "All-in-one eye health companion to reduce digital eye strain, improve vision habits, and provide clinically-backed exercises, tests, and protection.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
