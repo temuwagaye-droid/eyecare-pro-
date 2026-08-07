@@ -2,8 +2,11 @@ package com.example.ui.settings
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -12,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.*
@@ -24,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.example.service.EyeBreakReceiver
+import com.example.service.EyeFloatService
 
 data class EyeTip(val title: String, val category: String, val content: String)
 
@@ -189,6 +194,60 @@ fun TipsScreen(
                                 .testTag("test_notification_btn")
                         ) {
                             Text("Test Break Notification Now")
+                        }
+                    }
+                }
+            }
+
+            // Floating Button Over Other Apps Card
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        var floatingActive by remember { mutableStateOf(false) }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                                Icon(Icons.Default.Layers, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text("Floating Quick Break Button", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text("Display a floating button over other apps for instant breaks without opening the app.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                            Switch(
+                                checked = floatingActive,
+                                onCheckedChange = { active ->
+                                    if (active) {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(context)) {
+                                            val intent = Intent(
+                                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                                Uri.parse("package:${context.packageName}")
+                                            )
+                                            context.startActivity(intent)
+                                        } else {
+                                            floatingActive = true
+                                            EyeFloatService.startService(context)
+                                        }
+                                    } else {
+                                        floatingActive = false
+                                        EyeFloatService.stopService(context)
+                                    }
+                                },
+                                modifier = Modifier.testTag("floating_button_switch")
+                            )
                         }
                     }
                 }
