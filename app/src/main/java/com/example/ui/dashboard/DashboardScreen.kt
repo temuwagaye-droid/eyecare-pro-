@@ -33,7 +33,8 @@ fun DashboardScreen(
     onNavigateToExercises: () -> Unit,
     onNavigateToFatigue: () -> Unit,
     onNavigateToVisionTest: () -> Unit,
-    onNavigateToTips: () -> Unit
+    onNavigateToTips: () -> Unit,
+    onNavigateToRisk: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
@@ -79,46 +80,53 @@ fun DashboardScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Professional Logo & App Idea Banner Card
+            // Risk Prediction System Banner Card
             Card(
-                onClick = { viewModel.setAppIdeaDialogVisible(true) },
+                onClick = onNavigateToRisk,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .testTag("app_idea_banner_card"),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                    .testTag("risk_prediction_banner_card"),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Row(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(20.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(56.dp)
+                            .size(52.dp)
                             .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.tertiary),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.img_app_logo_1786061571283),
-                            contentDescription = "Professional Logo",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
+                        Icon(
+                            Icons.Default.Assessment,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onTertiary,
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Have an App Idea or Feedback?",
-                            style = MaterialTheme.typography.titleSmall,
+                            text = "Risk Prediction System",
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = "Tap here to send messages & feature suggestions directly to the team.",
+                            text = "Analyze eye strain risk based on Age, Screen Time, Symptoms & Multilingual options.",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
+                            color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
                         )
                     }
+                    Icon(
+                        Icons.Default.ArrowForward,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
                 }
             }
 
