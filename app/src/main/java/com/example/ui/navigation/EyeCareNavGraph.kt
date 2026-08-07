@@ -41,6 +41,8 @@ fun EyeCareNavGraph(
         composable("dashboard") {
             DashboardScreen(
                 viewModel = dashboardVm,
+                forceElegantDark = forceElegantDark,
+                onToggleElegantDark = onToggleElegantDark,
                 onNavigateToBlueLight = { navController.navigate("bluelight") },
                 onNavigateToExercises = { navController.navigate("exercises") },
                 onNavigateToFatigue = { navController.navigate("fatigue") },

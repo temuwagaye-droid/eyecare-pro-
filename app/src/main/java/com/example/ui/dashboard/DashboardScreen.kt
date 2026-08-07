@@ -29,6 +29,8 @@ import com.example.R
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel,
+    forceElegantDark: Boolean,
+    onToggleElegantDark: (Boolean) -> Unit,
     onNavigateToBlueLight: () -> Unit,
     onNavigateToExercises: () -> Unit,
     onNavigateToFatigue: () -> Unit,
@@ -80,6 +82,62 @@ fun DashboardScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Dark Mode / Glare Reduction Quick Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("dashboard_dark_mode_card"),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primaryContainer),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                if (forceElegantDark) Icons.Default.DarkMode else Icons.Default.WbSunny,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                        Column {
+                            Text(
+                                text = "Dark Mode (Glare Reduction)",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = if (forceElegantDark) "Active: Reducing eye strain for evening hours" else "Tap to switch to dark mode for evening hours",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    Switch(
+                        checked = forceElegantDark,
+                        onCheckedChange = onToggleElegantDark,
+                        modifier = Modifier.testTag("dashboard_dark_mode_switch")
+                    )
+                }
+            }
+
             // Risk Prediction System Banner Card
             Card(
                 onClick = onNavigateToRisk,
