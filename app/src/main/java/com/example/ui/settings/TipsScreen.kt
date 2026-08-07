@@ -1,19 +1,29 @@
 package com.example.ui.settings
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import com.example.service.EyeBreakReceiver
 
 data class EyeTip(val title: String, val category: String, val content: String)
 
@@ -25,6 +35,21 @@ fun TipsScreen(
     onBack: () -> Unit,
     onOpenPremium: () -> Unit
 ) {
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences(EyeBreakReceiver.PREF_NAME, Context.MODE_PRIVATE) }
+    var remindersEnabled by remember { mutableStateOf(prefs.getBoolean(EyeBreakReceiver.KEY_ENABLED, false)) }
+    var selectedInterval by remember { mutableStateOf(prefs.getLong(EyeBreakReceiver.KEY_INTERVAL, 20L)) }
+
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            remindersEnabled = true
+            prefs.edit().putBoolean(EyeBreakReceiver.KEY_ENABLED, true).apply()
+            EyeBreakReceiver.scheduleAlarm(context, selectedInterval)
+        }
+    }
+
     var waterGlasses by remember { mutableStateOf(5) }
 
     val tips = listOf(
@@ -79,6 +104,92 @@ fun TipsScreen(
                             onCheckedChange = onToggleElegantDark,
                             modifier = Modifier.testTag("force_dark_switch")
                         )
+                    }
+                }
+            }
+
+            // Screen Break Reminders Card
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                                Icon(Icons.Default.Notifications, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text("Screen Break Reminders", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text("Periodic alerts to rest your eyes (20-20-20 rule).", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                            Switch(
+                                checked = remindersEnabled,
+                                onCheckedChange = { enabled ->
+                                    if (enabled) {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                                            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+                                        ) {
+                                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                        } else {
+                                            remindersEnabled = true
+                                            prefs.edit().putBoolean(EyeBreakReceiver.KEY_ENABLED, true).apply()
+                                            EyeBreakReceiver.scheduleAlarm(context, selectedInterval)
+                                        }
+                                    } else {
+                                        remindersEnabled = false
+                                        prefs.edit().putBoolean(EyeBreakReceiver.KEY_ENABLED, false).apply()
+                                        EyeBreakReceiver.cancelAlarm(context)
+                                    }
+                                },
+                                modifier = Modifier.testTag("break_reminders_switch")
+                            )
+                        }
+
+                        if (remindersEnabled) {
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                            Text("Reminder Interval", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                listOf(10L to "10 min", 20L to "20 min", 30L to "30 min", 60L to "1 hour").forEach { (mins, label) ->
+                                    FilterChip(
+                                        selected = selectedInterval == mins,
+                                        onClick = {
+                                            selectedInterval = mins
+                                            prefs.edit().putLong(EyeBreakReceiver.KEY_INTERVAL, mins).apply()
+                                            if (remindersEnabled) {
+                                                EyeBreakReceiver.scheduleAlarm(context, mins)
+                                            }
+                                        },
+                                        label = { Text(label) },
+                                        modifier = Modifier.testTag("interval_chip_$mins")
+                                    )
+                                }
+                            }
+                        }
+
+                        Button(
+                            onClick = { EyeBreakReceiver.showInstantNotification(context) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("test_notification_btn")
+                        ) {
+                            Text("Test Break Notification Now")
+                        }
                     }
                 }
             }
