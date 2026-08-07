@@ -9,6 +9,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 
 private val ElegantDarkColorScheme =
   darkColorScheme(
@@ -28,18 +29,34 @@ private val ElegantDarkColorScheme =
 
 @Composable
 fun MyApplicationTheme(
-  darkTheme: Boolean = true,
-  // Dynamic color disabled by default to maintain the exact Elegant Dark aesthetic
+  forceElegantDark: Boolean = true,
   dynamicColor: Boolean = false,
   content: @Composable () -> Unit,
 ) {
+  val systemDark = isSystemInDarkTheme()
+  val effectiveDark = if (forceElegantDark) true else systemDark
+
   val colorScheme =
     when {
       dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
         val context = LocalContext.current
-        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        if (effectiveDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
       }
-      else -> ElegantDarkColorScheme
+      effectiveDark -> ElegantDarkColorScheme
+      else -> lightColorScheme(
+        primary = PrimaryBlue,
+        onPrimary = OnPrimaryBlue,
+        primaryContainer = PrimaryContainerBlue,
+        onPrimaryContainer = OnPrimaryContainerBlue,
+        secondary = TealAccent,
+        background = Color(0xFFF8F9FA),
+        onBackground = Color(0xFF1A1C1E),
+        surface = Color(0xFFFFFFFF),
+        onSurface = Color(0xFF1A1C1E),
+        surfaceVariant = Color(0xFFE1E2EC),
+        onSurfaceVariant = Color(0xFF44474F),
+        outline = Color(0xFF74777F)
+      )
     }
 
   MaterialTheme(

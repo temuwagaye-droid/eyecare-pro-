@@ -19,7 +19,12 @@ data class EyeTip(val title: String, val category: String, val content: String)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TipsScreen(onBack: () -> Unit, onOpenPremium: () -> Unit) {
+fun TipsScreen(
+    forceElegantDark: Boolean,
+    onToggleElegantDark: (Boolean) -> Unit,
+    onBack: () -> Unit,
+    onOpenPremium: () -> Unit
+) {
     var waterGlasses by remember { mutableStateOf(5) }
 
     val tips = listOf(
@@ -33,7 +38,7 @@ fun TipsScreen(onBack: () -> Unit, onOpenPremium: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Daily Eye Health & Nutrition") },
+                title = { Text("Settings & Eye Health Tips") },
                 navigationIcon = {
                     IconButton(onClick = onBack, modifier = Modifier.testTag("back_btn")) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -50,6 +55,34 @@ fun TipsScreen(onBack: () -> Unit, onOpenPremium: () -> Unit) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Theme & Appearance Settings Card
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("Force Elegant Dark Theme", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text("Enforce eye-saving dark palette or follow device system settings.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Switch(
+                            checked = forceElegantDark,
+                            onCheckedChange = onToggleElegantDark,
+                            modifier = Modifier.testTag("force_dark_switch")
+                        )
+                    }
+                }
+            }
+
             // Hydration Tracker Card
             item {
                 Card(
@@ -129,6 +162,38 @@ fun TipsScreen(onBack: () -> Unit, onOpenPremium: () -> Unit) {
                             }
                         }
                         Text(tip.content, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+
+            // Developer Profile Card
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Developer Profile",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            text = "Temeselew Buta (Temu)",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            text = "Lead Android & AI Vision Software Engineer dedicated to creating professional eye wellness solutions.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
+                        )
                     }
                 }
             }

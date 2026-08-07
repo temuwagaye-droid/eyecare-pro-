@@ -21,7 +21,10 @@ import com.example.ui.visiontest.VisionTestScreen
 import com.example.ui.visiontest.VisionTestViewModel
 
 @Composable
-fun EyeCareNavGraph() {
+fun EyeCareNavGraph(
+    forceElegantDark: Boolean,
+    onToggleElegantDark: (Boolean) -> Unit
+) {
     val navController = rememberNavController()
     val context = LocalContext.current.applicationContext as Application
 
@@ -58,6 +61,8 @@ fun EyeCareNavGraph() {
         }
         composable("tips") {
             TipsScreen(
+                forceElegantDark = forceElegantDark,
+                onToggleElegantDark = onToggleElegantDark,
                 onBack = { navController.popBackStack() },
                 onOpenPremium = { showPremiumModal = true }
             )
