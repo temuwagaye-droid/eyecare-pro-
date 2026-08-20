@@ -402,14 +402,30 @@ fun DashboardScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = "Next break in ${uiState.timeToNextBreakSeconds / 60} mins",
                             style = MaterialTheme.typography.bodyMedium
                         )
-                        TextButton(onClick = { viewModel.triggerBreakReminder() }) {
-                            Text("Take Break Now")
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            OutlinedButton(
+                                onClick = onNavigateToTips,
+                                modifier = Modifier.testTag("customize_frequency_card_btn"),
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                            ) {
+                                Icon(Icons.Default.Tune, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Customize", style = MaterialTheme.typography.labelMedium)
+                            }
+                            Button(
+                                onClick = { viewModel.triggerBreakReminder() },
+                                modifier = Modifier.testTag("take_break_now_btn"),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                            ) {
+                                Text("Break Now", style = MaterialTheme.typography.labelMedium)
+                            }
                         }
                     }
                 }

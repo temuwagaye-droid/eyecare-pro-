@@ -66,6 +66,9 @@ class EyeBreakReceiver : BroadcastReceiver() {
         const val PREF_NAME = "eye_break_prefs"
         const val KEY_ENABLED = "break_reminders_enabled"
         const val KEY_INTERVAL = "break_interval_minutes"
+        const val KEY_SOUND_MODE = "break_sound_mode" // "all", "vibrate", "silent"
+        const val KEY_BREAK_TYPE = "break_type" // "20_20_20", "blink", "stretch", "posture"
+        const val KEY_QUIET_HOURS = "break_quiet_hours_enabled"
 
         fun scheduleAlarm(context: Context, intervalMinutes: Long) {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -101,14 +104,16 @@ class EyeBreakReceiver : BroadcastReceiver() {
             alarmManager.cancel(pendingIntent)
         }
 
-        fun showInstantNotification(context: Context) {
+        fun showInstantNotification(context: Context, customTitle: String? = null, customMessage: String? = null) {
             val notificationManager = NotificationManagerCompat.from(context)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channel = NotificationChannel(
                     CHANNEL_ID,
                     "Eye Care Break Reminders",
                     NotificationManager.IMPORTANCE_HIGH
-                )
+                ).apply {
+                    description = "Regular eye strain breaks and screen resting alerts."
+                }
                 val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 manager.createNotificationChannel(channel)
             }
@@ -121,10 +126,14 @@ class EyeBreakReceiver : BroadcastReceiver() {
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
 
+            val title = customTitle ?: "👁️ Eye Break Reminder Tested!"
+            val message = customMessage ?: "Your custom break notification is working! Look 20 feet away for 20 seconds to relieve strain."
+
             val notification = NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.ic_menu_view)
-                .setContentTitle("👁️ Eye Break Reminder Tested!")
-                .setContentText("Your break notification system is active! Look away 20 feet for 20 seconds.")
+                .setContentTitle(title)
+                .setContentText(message)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(message))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)

@@ -17,6 +17,7 @@ import com.example.ui.fatigue.FatigueScanScreen
 import com.example.ui.fatigue.FatigueScanViewModel
 import com.example.ui.risk.RiskPredictionScreen
 import com.example.ui.settings.PremiumUpgradeModal
+import com.example.ui.settings.SettingsScreen
 import com.example.ui.settings.TipsScreen
 import com.example.ui.visiontest.VisionTestScreen
 import com.example.ui.visiontest.VisionTestViewModel
@@ -47,7 +48,7 @@ fun EyeCareNavGraph(
                 onNavigateToExercises = { navController.navigate("exercises") },
                 onNavigateToFatigue = { navController.navigate("fatigue") },
                 onNavigateToVisionTest = { navController.navigate("visiontest") },
-                onNavigateToTips = { navController.navigate("tips") },
+                onNavigateToTips = { navController.navigate("settings") },
                 onNavigateToRisk = { navController.navigate("risk") }
             )
         }
@@ -66,8 +67,16 @@ fun EyeCareNavGraph(
         composable("risk") {
             RiskPredictionScreen(onBack = { navController.popBackStack() })
         }
+        composable("settings") {
+            SettingsScreen(
+                forceElegantDark = forceElegantDark,
+                onToggleElegantDark = onToggleElegantDark,
+                onBack = { navController.popBackStack() },
+                onOpenPremium = { showPremiumModal = true }
+            )
+        }
         composable("tips") {
-            TipsScreen(
+            SettingsScreen(
                 forceElegantDark = forceElegantDark,
                 onToggleElegantDark = onToggleElegantDark,
                 onBack = { navController.popBackStack() },
