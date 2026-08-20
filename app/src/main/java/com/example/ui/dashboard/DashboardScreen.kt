@@ -9,6 +9,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -63,11 +65,33 @@ fun DashboardScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.setAppIdeaDialogVisible(true) }, modifier = Modifier.testTag("send_idea_button")) {
-                        Icon(Icons.Default.Send, contentDescription = "Send App Idea")
+                    IconButton(
+                        onClick = onNavigateToBlueLight,
+                        modifier = Modifier.testTag("top_bluelight_button")
+                    ) {
+                        Icon(
+                            Icons.Default.WbSunny,
+                            contentDescription = "Blue Light Filter",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                     }
-                    IconButton(onClick = onNavigateToTips, modifier = Modifier.testTag("tips_button")) {
-                        Icon(Icons.Default.Lightbulb, contentDescription = "Eye Health Tips")
+                    IconButton(
+                        onClick = { viewModel.setAppIdeaDialogVisible(true) },
+                        modifier = Modifier.testTag("send_idea_button")
+                    ) {
+                        Icon(
+                            Icons.Default.Feedback,
+                            contentDescription = "Send App Idea & Feedback"
+                        )
+                    }
+                    IconButton(
+                        onClick = onNavigateToTips,
+                        modifier = Modifier.testTag("tips_button")
+                    ) {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = "Settings & Eye Health Tips"
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -282,7 +306,7 @@ fun DashboardScreen(
                         )
                     }
                     Icon(
-                        Icons.Default.ArrowForward,
+                        Icons.AutoMirrored.Filled.ArrowForward,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onTertiaryContainer
                     )
